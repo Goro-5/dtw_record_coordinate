@@ -55,8 +55,8 @@ def on_image_click(event, index):
     global camera_number
     camera_number = index
     for label in camera_labels:
-        label.config(borderwidth=0)
-    event.widget.config(borderwidth=2, relief="solid")
+        label.config(borderwidth=0, relief="flat", highlightbackground="black", highlightcolor="black", highlightthickness=0)
+    event.widget.config(borderwidth=2, relief="solid", highlightbackground="red", highlightcolor="red", highlightthickness=2)
 
 
 def show_camera_images():
@@ -184,8 +184,8 @@ def get_camera_info(camera_number, height, size):
 
             # If QR code is not detected, show warning message on screen
             if not qr_code_detected(frame,qr):
-                cv2.putText(frame, "QR code UNDETECTED", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 show_frame = cv2.resize(frame, (640, 480))
+                cv2.putText(show_frame, "QR code UNDETECTED", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 cv2.imshow("Camera Output", show_frame)
                 k = cv2.waitKey(1) & 0xFF
                 if k == ord('q'):
@@ -198,8 +198,8 @@ def get_camera_info(camera_number, height, size):
                     points = points.astype(np.int32)
                     # QRコードを検出した位置に四角形を描画
                     cv2.polylines(frame, [points], True, (0, 255, 0), thickness=5)
-                    cv2.putText(frame, "DETECTED!!", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                     show_frame = cv2.resize(frame, (640, 480))
+                    cv2.putText(show_frame, "DETECTED!!", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                     cv2.imshow("Camera Output", show_frame)
                     y_fov = calculate_y_fov(size, frame, height, points)
                     y_fov_list.append(y_fov)
@@ -284,7 +284,6 @@ def main():
         resize = cv2.resize(color,(640,480))
         cv2.imshow("sample",resize)
         save_data(name, camera_index, y_fov, camera_pixel_height, camera_pixel_width, height)
-        cv2.waitKey(0)
 
 
 if __name__ == "__main__":
