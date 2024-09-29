@@ -89,6 +89,9 @@ def on_confirm2(current_frame):
 
 def on_confirm(root, current_frame):
     global img_id
+
+    root.attributes("-fullscreen", not root.attributes("-fullscreen"))
+
     if img_id is None:
         tk.messagebox.showerror("Error", "Please select an image.")
         return
@@ -119,13 +122,14 @@ def on_confirm(root, current_frame):
     select_image_button.pack(pady=10)
 
 def get_orientation(img_id):
-    global quaternion_merged, id
+    global quaternion_merged, id, cap
     quaternion_merged = None
-    cv2.VideoCapture(camera_number)
-    cap = cv2.VideoCapture(camera_number)
-    # 画質を設定
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, camera_pixel_width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, camera_pixel_height)
+    if cap is None:
+        cv2.VideoCapture(camera_number)
+        cap = cv2.VideoCapture(camera_number)
+        # 画質を設定
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, camera_pixel_width)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, camera_pixel_height)
     
     qr_points_list = []
     qr_frame_list = []
@@ -147,7 +151,7 @@ def get_orientation(img_id):
                 qr_points_list.append(points)
                 print(len(qr_points_list))
 
-        if len(qr_points_list) > 10:
+        if len(qr_points_list) > 0:
             areas = []
             for points in qr_points_list:
                 # Calculate the area of the polygon formed by the points
@@ -173,7 +177,7 @@ def get_orientation(img_id):
 
 def on_execute_button(current_frame):
     # UIのフレームを破棄して、レンダリング中と表記
-    root.attributes("-fullscreen", False)
+    
     current_frame.destroy()
     current_frame = tk.Frame(root)
     current_frame.pack(expand=True, fill="both", pady=20, padx=20)
@@ -302,7 +306,7 @@ def original_selection(current_frame):
 
 
 def UI():
-    global camera_data, camera_var, selected_obj_files, root, current_frame, output_folder_path
+    global camera_data, camera_var, selected_obj_files, root, current_frame, output_folder_path, cap
 
     # Initialize the main application window
     root = tk.Tk()
@@ -310,6 +314,7 @@ def UI():
 
     output_folder_path = ""
 
+    cap = None
 
     # Load camera data from JSON
     camera_data_path = filedialog.askopenfilename(title="Select Camera Data JSON", filetypes=[("JSON Files", "*.json")])
